@@ -29,12 +29,14 @@ void process_signal(){
   int auxCounter = 0;
 
   removeFile(linesFile);
+  removeFile(pulsesFile);
   
   float thLow = 0; 
   float thHigh = 0;
   int lambda;
   int tCounter = 0;
   int zCounter = 0;
+  int peakCounter = 0;
   
   int z_amp [3];
   float z_slope [3];
@@ -150,16 +152,67 @@ void process_signal(){
     2. compare to threshold high and low, and compare previous and next slopes
     3. if valid, save line to valid lines file
   */
+  peakCounter = 0;
+  if (!auxFile.open(linesFile, O_READ)) {
+    sd.errorHalt("opening test.txt for read failed");
+  }
+
+  auxFile.fgets(r_line, sizeof(r_line));
+  split_line(r_line, z_amp, z_slope, z_peak, 0);
+  auxFile.fgets(r_line, sizeof(r_line));
+  split_line(r_line, z_amp, z_slope, z_peak, 1);
+  auxFile.fgets(r_line, sizeof(r_line));
+  split_line(r_line, z_amp, z_slope, z_peak, 2);
+
+  if (z_amp[0] <= thHigh && z_amp[0] >= thLow && z_slope[1] != 0){
+    writeLineToFile(pulsesFile, z_amp[0], z_slope[0], z_peak[0]);
+    peakCounter++;
+  }
+
+
+  while ((n = (int) auxFile.fgets(r_line, sizeof(r_line))) > 0){
+    //Serial.println(r_line);
+    split_line(r_line, &line_amp, &line_slope, &line_peak, 0);
+
+    if (z_amp[1] <= thHigh && z_amp[1] >= thLow && z_slope[0] != 0 && z_slope[2] != 0){
+      writeLineToFile(pulsesFile, z_amp[1], z_slope[1], z_peak[1]);
+      peakCounter++;
+    }
+
+    z_amp[0] = z_amp[1];
+    z_amp[1] = z_amp[2];
+    z_amp[2] = line_amp;
+    z_slope[0] = z_slope[1];
+    z_slope[1] = z_slope[2];
+    z_slope[2] = line_slope;
+    z_peak[0] = z_peak[1];
+    z_peak[1] = z_peak[2];
+    z_peak[2] = line_peak;
+
+  }
+  auxFile.close();
+
+  if (z_amp[1] <= thHigh && z_amp[1] >= thLow && z_slope[0] != 0 && z_slope[2] != 0){
+    writeLineToFile(pulsesFile, z_amp[1], z_slope[1], z_peak[1]);
+    peakCounter++;
+  }
+
+  if (z_amp[2] <= thHigh && z_amp[2] >= thLow && z_slope[1] != 0){
+    writeLineToFile(pulsesFile, z_amp[2], z_slope[2], z_peak[2]);
+    peakCounter++;
+  }
+
+
   //-----------------------------------------------ARTIFACT Algorithm END
 
   //Serial.println(z_amp[0]);
   //Serial.println(z_slope[0]);
   //Serial.println(z_peak[0]);
-
-  Serial.println(thLow);
+  Serial.println(zCounter);
   Serial.println(thHigh);
+  Serial.println(thLow);
   //Serial.println(iCounter);
   //Serial.println(tCounter);
-  Serial.println(zCounter);
+  Serial.println(peakCounter);
 }
 

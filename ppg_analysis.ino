@@ -11,7 +11,8 @@
 #define TH 80
 
 int data_b3[LENGTH_2];
-char linesFile[] = "lines_1.txt";
+char linesFile[] = "lines_3.txt";
+char pulsesFile[] = "pulses_3.txt";
 //----------------------------- 
 
 
@@ -39,13 +40,14 @@ volatile byte cycleCounter; //capturing cycles counter
 const int chipSelect = 4;
 SdFat sd;
 SdFile myFile;
+SdFile auxFile;
 //-----------------------------
 
 volatile byte ledFlag = LOW;
 volatile boolean write_flag;
 boolean read_flag;
 
-char filename[] = "signal_1.txt";
+char filename[] = "signal_3.txt";
 
 void setup() {
   pinMode(LED_PIN, OUTPUT);
