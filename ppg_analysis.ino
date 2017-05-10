@@ -13,9 +13,10 @@
 int data_b3[LENGTH_2];
 char linesFile[] = "lines_3.txt";
 char pulsesFile[] = "pulses_3.txt";
+char d1_file[] = "d1_signal_3.txt";
 //----------------------------- 
 
-
+#define FS 50.0   //Frequency (Hz)
 #define LENGTH 500 //Fs*recording_time (hz*sec)
 #define CAP_CYCLES 2 //(Fs*recording_time)/lenght
 const float VOLTAGE_STEP = 0.0048828125; //AD 10bits converter (0-5 volts)
@@ -65,12 +66,14 @@ void setup() {
 
   read_flag = true;
 
-  removeFile(filename);
+  //removeFile(filename);
   
-  interruptSetup();
+  //interruptSetup();
   SDCardSetup();
-  readFileToVector(filename, data_b3, LENGTH_2);
-  process_signal();
+  //readFileToVector(filename, data_b3, LENGTH_2);
+  //process_signal();
+  //three_point_derivative_method();
+  find_b_peaks();
 }
 
 void loop() {

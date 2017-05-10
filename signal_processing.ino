@@ -216,3 +216,100 @@ void process_signal(){
   Serial.println(peakCounter);
 }
 
+void three_point_derivative_method(){
+  float T = 1/FS;
+  int d1_point;
+
+  int LEN = 1000;
+
+  int b = 0;
+  int e = 2;
+
+  removeFile(d1_file);
+
+  if (!myFile.open(d1_file, O_RDWR | O_CREAT | O_AT_END)) {
+    sd.errorHalt("opening test.txt for write failed");
+  }
+
+  while (e <= LEN){
+    d1_point = (int) ((data_b3[e] - data_b3[b])/(2*T));
+    //writeFloatToFile(d1_file, d1_point);
+
+    myFile.println(d1_point);
+    //Serial.println(d1_point);
+    b++;
+    e++;
+  }
+  myFile.close();
+
+}
+
+int findNextLocalMin(int b, int e){
+  int result;
+  while ((b + 1) <= e && data_b3[b + 1] < data_b3[b]){
+    b++;
+  }
+
+  if (b >= e){
+    result = -1;
+  }else{
+    result = b;
+  }
+  return result;
+}
+
+int findNextLocalMax(int b, int e){
+  int result = 0;
+  while ((b + 1) <= e && data_b3[b + 1] > data_b3[b]){
+    b++;
+  }
+
+  if (b >= e){
+    result = -1;
+  }else{
+    result = b;
+  }
+  return result;
+}
+
+
+void find_b_peaks(){
+  /*
+  1. read line from a_ppg
+  2. find next min local
+  3. find next max local
+  4. find prev zero cross
+  5. find next zero cross
+
+  E SE B NAO EXISTIR?
+  */
+
+  int line_amp;
+  float line_slope;
+  int line_peak;
+
+  int localMin;
+  int localMax;
+
+  readFileToVector(d1_file, data_b3, 998);
+
+  if (!myFile.open(pulsesFile, O_READ)) {
+    sd.errorHalt("opening test.txt for read failed");
+  }
+
+  byte n;
+  char r_line[20];
+  while ((n = (int) myFile.fgets(r_line, sizeof(r_line))) > 0){
+    split_line(r_line, &line_amp, &line_slope, &line_peak, 0);
+
+    //Serial.println(line_peak+1);
+    localMin = findNextLocalMin(line_peak, 998);
+    localMax = findNextLocalMax(localMin, 998);
+    Serial.print(localMin + 1);
+    Serial.print("\t");
+    Serial.println(localMax + 1);
+    
+  }
+  myFile.close();
+
+}

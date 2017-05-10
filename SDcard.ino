@@ -51,7 +51,7 @@ void readFileToVector(char* fname, int* data, int len){
   int readData;
   int count = 0;
 
-  char line[6];
+  char line[8];
   int n;
   while (((n = myFile.fgets(line, sizeof(line))) > 0) && count < len) {
     data[count] = atoi(line);
@@ -74,4 +74,3 @@ void writeLineToFile(char* fname, int amp, float slope, int tPeak){
 
   myFile.close();
 }
-
