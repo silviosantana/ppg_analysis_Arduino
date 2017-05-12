@@ -8,18 +8,28 @@
 #define HIGHSLOW 1.2
 #define LOWFAST 0.6
 #define HIGHFAST 1.4
-#define TH 80
+#define TH 120
 
 int data_b3[LENGTH_2];
 char linesFile[] = "lines_3.txt";
 char pulsesFile[] = "pulses_3.txt";
 char d1_file[] = "d1_signal_3.txt";
+char parametersFile[] = "parameters_3.txt";
 //----------------------------- 
 
 #define FS 50.0   //Frequency (Hz)
 #define LENGTH 500 //Fs*recording_time (hz*sec)
 #define CAP_CYCLES 2 //(Fs*recording_time)/lenght
 const float VOLTAGE_STEP = 0.0048828125; //AD 10bits converter (0-5 volts)
+
+//----------------------------- INDEXES
+float PPT;
+float RI;
+float DELTAT;
+float CT;
+float RRT;
+float DELTAP; 
+//----------------------------- end INDEXES
 
 //----------------------------- PIN's
 const byte LED_PIN = 13;
@@ -36,6 +46,7 @@ volatile boolean buffer_flag = true;  //flag to choose the buffer
 volatile float temp;
 volatile int cTime;// store current time
 volatile byte cycleCounter; //capturing cycles counter
+float IBI;
 
 //-----------------------------SD Card
 const int chipSelect = 4;
@@ -66,14 +77,16 @@ void setup() {
 
   read_flag = true;
 
+  IBI = 0;
+
   //removeFile(filename);
   
   //interruptSetup();
   SDCardSetup();
-  //readFileToVector(filename, data_b3, LENGTH_2);
-  //process_signal();
+  readFileToVector(filename, data_b3, LENGTH_2);
+  process_signal();
   //three_point_derivative_method();
-  find_b_peaks();
+  //find_b_peaks();
 }
 
 void loop() {

@@ -61,7 +61,7 @@ void readFileToVector(char* fname, int* data, int len){
   myFile.close();
 }
 
-void writeLineToFile(char* fname, int amp, float slope, int tPeak){
+void writeLineToFile(char* fname, int amp, float slope, int tPeak, int tBegin){
   if (!myFile.open(fname, O_RDWR | O_CREAT | O_AT_END)) {
     sd.errorHalt("opening test.txt for write failed");
   }
@@ -70,7 +70,26 @@ void writeLineToFile(char* fname, int amp, float slope, int tPeak){
   myFile.print(";");
   myFile.print(slope);
   myFile.print(";");
-  myFile.println(tPeak);
+  myFile.print(tPeak);
+  myFile.print(";");
+  myFile.println(tBegin);
+
+
+  myFile.close();
+}
+
+void writeWaveParametersToFile(char* fname, int bg, int a, int dn, int b){
+  if (!myFile.open(fname, O_RDWR | O_CREAT | O_AT_END)) {
+    sd.errorHalt("opening test.txt for write failed");
+  }
+
+  myFile.print(bg);
+  myFile.print(";");
+  myFile.print(a);
+  myFile.print(";");
+  myFile.print(dn);
+  myFile.print(";");
+  myFile.println(b);
 
   myFile.close();
 }

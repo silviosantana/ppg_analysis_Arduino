@@ -10,7 +10,7 @@ int slope_signal(float slope){
   }
 }
 
-void split_line(char* r_line, int* amp, float* slope, int* peak, int pos){
+void split_line(char* r_line, int* amp, float* slope, int* peak, int* begin, int pos){
   char* pch;
   pch = strtok (r_line,";");
   amp [pos] = atoi(pch);
@@ -18,6 +18,8 @@ void split_line(char* r_line, int* amp, float* slope, int* peak, int pos){
   slope [pos] = atof(pch);
   pch = strtok (NULL, ";");
   peak [pos] = atoi(pch);
+  pch = strtok (NULL, ";");
+  begin [pos] = atoi(pch);
 }
 
 
@@ -26,7 +28,7 @@ void process_signal(){
 
   char r_line[20];
   byte n;
-  int auxCounter = 0;
+  
 
   removeFile(linesFile);
   removeFile(pulsesFile);
@@ -41,18 +43,22 @@ void process_signal(){
   int z_amp [3];
   float z_slope [3];
   int z_peak [3];
+  int z_begin[3];
   
   int line_amp;
   float line_slope;
   int line_peak;
+  int line_begin;
   
   int prev_amp;
   float prev_slope;
   int prev_peak;
+  int prev_begin;
 
   prev_slope = (float)(data_b3[m]-data_b3[0])/m;
   prev_amp = (data_b3[m]-data_b3[0]);
   prev_peak = m;
+  prev_begin = 0;
   tCounter += m;
 
   zCounter = 0;
@@ -63,6 +69,7 @@ void process_signal(){
     line_slope = (float)(data_b3[tCounter + m]-data_b3[tCounter])/m;
     line_amp = (data_b3[tCounter + m]-data_b3[tCounter]);
     line_peak = tCounter + m;
+    line_begin = tCounter;
 
     //Serial.print(prev_slope);
     //Serial.print("\t");
@@ -75,14 +82,16 @@ void process_signal(){
       prev_slope = line_slope;
       prev_amp = prev_amp + line_amp;
       prev_peak = line_peak;
+      //prev_begin still the same
     }else{
       //_____________save prev line as z to file HERE
-      writeLineToFile(linesFile, prev_amp, prev_slope, prev_peak);
+      writeLineToFile(linesFile, prev_amp, prev_slope, prev_peak, prev_begin);
       //Serial.println(line_slope);
 
       prev_slope = line_slope;
       prev_amp = line_amp;
       prev_peak = line_peak;
+      prev_begin = line_begin;
 
       zCounter ++;
     }
@@ -97,22 +106,35 @@ void process_signal(){
   }
 
   myFile.fgets(r_line, sizeof(r_line));
-  split_line(r_line, z_amp, z_slope, z_peak, 0);
+  split_line(r_line, z_amp, z_slope, z_peak, z_begin, 0);
   if (z_amp[0] >= TH){
     thLow = z_amp[0]*LOWSLOW;
     thHigh = z_amp[0]*HIGHSLOW;
   }
   myFile.fgets(r_line, sizeof(r_line));
-  split_line(r_line, z_amp, z_slope, z_peak, 1);
+  split_line(r_line, z_amp, z_slope, z_peak, z_begin, 1);
   myFile.fgets(r_line, sizeof(r_line));
-  split_line(r_line, z_amp, z_slope, z_peak, 2);
+  split_line(r_line, z_amp, z_slope, z_peak, z_begin, 2);
 
+  int IBIcounter = -1;
+  int prev_tPeak;
+  IBI = 0;
 
   while ((n = (int) myFile.fgets(r_line, sizeof(r_line))) > 0){
     //Serial.println(r_line);
-    split_line(r_line, &line_amp, &line_slope, &line_peak, 0);
+    split_line(r_line, &line_amp, &line_slope, &line_peak, &line_begin, 0);
 
     if (z_amp[1] >= TH){
+
+      if (IBIcounter == -1){
+        prev_tPeak = z_peak[1];
+        IBIcounter++;
+      }else{
+        IBI += (z_peak[1] - prev_tPeak);
+        prev_tPeak = z_peak[1];
+        IBIcounter ++;
+      }
+
       if (thLow == 0 && thHigh == 0){
         thLow = z_amp[1]*LOWSLOW;
         thHigh = z_amp[1]*HIGHSLOW;
@@ -143,6 +165,11 @@ void process_signal(){
 
   }
   myFile.close();
+
+  IBI = IBI/IBIcounter;
+  Serial.println(IBIcounter);
+  Serial.println(IBI);
+
   //-----------------------------------------------THRESHOLD Algorithm END
 
 
@@ -158,24 +185,24 @@ void process_signal(){
   }
 
   auxFile.fgets(r_line, sizeof(r_line));
-  split_line(r_line, z_amp, z_slope, z_peak, 0);
+  split_line(r_line, z_amp, z_slope, z_peak, z_begin, 0);
   auxFile.fgets(r_line, sizeof(r_line));
-  split_line(r_line, z_amp, z_slope, z_peak, 1);
+  split_line(r_line, z_amp, z_slope, z_peak, z_begin, 1);
   auxFile.fgets(r_line, sizeof(r_line));
-  split_line(r_line, z_amp, z_slope, z_peak, 2);
+  split_line(r_line, z_amp, z_slope, z_peak, z_begin, 2);
 
   if (z_amp[0] <= thHigh && z_amp[0] >= thLow && z_slope[1] != 0){
-    writeLineToFile(pulsesFile, z_amp[0], z_slope[0], z_peak[0]);
+    writeLineToFile(pulsesFile, z_amp[0], z_slope[0], z_peak[0], z_begin[0]);
     peakCounter++;
   }
 
 
   while ((n = (int) auxFile.fgets(r_line, sizeof(r_line))) > 0){
     //Serial.println(r_line);
-    split_line(r_line, &line_amp, &line_slope, &line_peak, 0);
+    split_line(r_line, &line_amp, &line_slope, &line_peak, &line_begin, 0);
 
     if (z_amp[1] <= thHigh && z_amp[1] >= thLow && z_slope[0] != 0 && z_slope[2] != 0){
-      writeLineToFile(pulsesFile, z_amp[1], z_slope[1], z_peak[1]);
+      writeLineToFile(pulsesFile, z_amp[1], z_slope[1], z_peak[1], z_begin[1]);
       peakCounter++;
     }
 
@@ -188,17 +215,20 @@ void process_signal(){
     z_peak[0] = z_peak[1];
     z_peak[1] = z_peak[2];
     z_peak[2] = line_peak;
+    z_begin[0] = z_begin[1];
+    z_begin[1] = z_begin[2];
+    z_begin[2] = line_begin;
 
   }
   auxFile.close();
 
   if (z_amp[1] <= thHigh && z_amp[1] >= thLow && z_slope[0] != 0 && z_slope[2] != 0){
-    writeLineToFile(pulsesFile, z_amp[1], z_slope[1], z_peak[1]);
+    writeLineToFile(pulsesFile, z_amp[1], z_slope[1], z_peak[1], z_begin[1]);
     peakCounter++;
   }
 
   if (z_amp[2] <= thHigh && z_amp[2] >= thLow && z_slope[1] != 0){
-    writeLineToFile(pulsesFile, z_amp[2], z_slope[2], z_peak[2]);
+    writeLineToFile(pulsesFile, z_amp[2], z_slope[2], z_peak[2], z_begin[2]);
     peakCounter++;
   }
 
@@ -208,12 +238,12 @@ void process_signal(){
   //Serial.println(z_amp[0]);
   //Serial.println(z_slope[0]);
   //Serial.println(z_peak[0]);
-  Serial.println(zCounter);
-  Serial.println(thHigh);
-  Serial.println(thLow);
+  //Serial.println(zCounter);
+  //Serial.println(thHigh);
+  //Serial.println(thLow);
   //Serial.println(iCounter);
   //Serial.println(tCounter);
-  Serial.println(peakCounter);
+  //Serial.println(peakCounter);
 }
 
 void three_point_derivative_method(){
@@ -272,44 +302,88 @@ int findNextLocalMax(int b, int e){
   return result;
 }
 
+int findNextZeroCrossing (int b, int e){ // e se b nao existe?
+  int result = 0;
+  while (b < e && data_b3[b] > 0){
+    b++;
+  }
+
+  if (b >= e){
+    result = -1;
+  }else{
+    result = b;
+  }
+  return result;
+}
+
+int findPrevZeroCrossing (int b, int e){
+  int result = 0;
+  while (b > 0 && data_b3[b] > 0){
+    b--;
+  }
+
+  if (b <= 0){
+    result = -1;
+  }else{
+    result = b;
+  }
+  return result;
+}
+
 
 void find_b_peaks(){
   /*
-  1. read line from a_ppg
-  2. find next min local
-  3. find next max local
-  4. find prev zero cross
-  5. find next zero cross
-
   E SE B NAO EXISTIR?
   */
+
+  int OFFSET = (int) (240/1000)*FS; //aparentemente muito grande
 
   int line_amp;
   float line_slope;
   int line_peak;
+  int line_begin;
 
   int localMin;
   int localMax;
+  int nextZero;
+  int prevZero;
 
-  readFileToVector(d1_file, data_b3, 998);
+  removeFile(parametersFile);
 
-  if (!myFile.open(pulsesFile, O_READ)) {
+  readFileToVector(d1_file, data_b3, LENGTH_2 - 2);
+
+  if (!auxFile.open(pulsesFile, O_READ)) {
     sd.errorHalt("opening test.txt for read failed");
   }
 
   byte n;
   char r_line[20];
-  while ((n = (int) myFile.fgets(r_line, sizeof(r_line))) > 0){
-    split_line(r_line, &line_amp, &line_slope, &line_peak, 0);
+  while ((n = (int) auxFile.fgets(r_line, sizeof(r_line))) > 0){
+    split_line(r_line, &line_amp, &line_slope, &line_peak, &line_begin, 0);
 
     //Serial.println(line_peak+1);
-    localMin = findNextLocalMin(line_peak, 998);
-    localMax = findNextLocalMax(localMin, 998);
-    Serial.print(localMin + 1);
+    localMin = findNextLocalMin(line_peak, LENGTH_2 -2);
+    localMax = findNextLocalMax(localMin, LENGTH_2 - 2);
+
+    if (data_b3[localMax] > 0){
+      nextZero = findNextZeroCrossing(localMax, LENGTH_2 - 2);
+      prevZero = findPrevZeroCrossing(localMax, LENGTH_2 - 2);
+    }else{
+      nextZero = localMax;
+      prevZero = localMax - OFFSET;  //determinar offset correto
+    }
+
+    writeWaveParametersToFile(parametersFile, line_begin, line_peak, prevZero, nextZero);
+
+    Serial.print(line_begin + 1);
     Serial.print("\t");
-    Serial.println(localMax + 1);
+    Serial.print(line_peak + 1);
+    Serial.print("\t");
+    Serial.print(prevZero + 1);
+    Serial.print("\t");
+    Serial.println(nextZero + 1);
     
   }
-  myFile.close();
+  auxFile.close();
 
 }
