@@ -373,15 +373,16 @@ void find_b_peaks(){
       prevZero = localMax - OFFSET;  //determinar offset correto
     }
 
+    //t_begin | t_a_peak | dicrotic notch | t_b_peak
     writeWaveParametersToFile(parametersFile, line_begin, line_peak, prevZero, nextZero);
 
-    Serial.print(line_begin + 1);
-    Serial.print("\t");
-    Serial.print(line_peak + 1);
-    Serial.print("\t");
-    Serial.print(prevZero + 1);
-    Serial.print("\t");
-    Serial.println(nextZero + 1);
+    //Serial.print(line_begin + 1);
+    //Serial.print("\t");
+    //Serial.print(line_peak + 1);
+    //Serial.print("\t");
+    //Serial.print(prevZero + 1);
+    //Serial.print("\t");
+    //Serial.println(nextZero + 1);
     
   }
   auxFile.close();

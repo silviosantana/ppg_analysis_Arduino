@@ -87,6 +87,7 @@ void setup() {
   process_signal();
   //three_point_derivative_method();
   //find_b_peaks();
+  compute_indexes();
 }
 
 void loop() {
