@@ -11,15 +11,15 @@
 #define TH 120
 
 int data_b3[LENGTH_2];
-char linesFile[] = "lines_3.txt";
-char pulsesFile[] = "pulses_3.txt";
-char d1_file[] = "d1_signal_3.txt";
-char parametersFile[] = "parameters_3.txt";
+char linesFile[] = "lines_t.txt";
+char pulsesFile[] = "pulses_t.txt";
+char d1_file[] = "d1_signal_t.txt";
+char parametersFile[] = "parameters_t.txt";
 //----------------------------- 
 
 #define FS 50.0   //Frequency (Hz)
-#define LENGTH 500 //Fs*recording_time (hz*sec)
-#define CAP_CYCLES 2 //(Fs*recording_time)/lenght
+#define LENGTH 1000 //Fs*recording_time (hz*sec)
+#define CAP_CYCLES 1 //(Fs*recording_time)/lenght
 const float VOLTAGE_STEP = 0.0048828125; //AD 10bits converter (0-5 volts)
 
 //----------------------------- INDEXES
@@ -33,19 +33,17 @@ float DELTAP;
 
 //----------------------------- PIN's
 const byte LED_PIN = 13;
-const byte SENSOR_PIN = 8;
+const byte SENSOR_A_PIN = 8;
 //-----------------------------
 
-volatile int signal_in;
+volatile int signalA_in;
 volatile int data_b1[LENGTH];      //rough signal input buffer 1
 volatile int data_b2[LENGTH];      //rough signal input buffer 2
-//volatile float v_data[LENGTH];    //voltage signal input 
 volatile int data_counter = 0;
-volatile byte cap_flag = LOW; //flag to capture
+volatile byte cap_flag = LOW;     //flag to capture
 volatile boolean buffer_flag = true;  //flag to choose the buffer
 volatile float temp;
 volatile int cTime;// store current time
-volatile byte cycleCounter; //capturing cycles counter
 float IBI;
 
 //-----------------------------SD Card
@@ -59,17 +57,16 @@ volatile byte ledFlag = LOW;
 volatile boolean write_flag;
 boolean read_flag;
 
-char filename[] = "signal_3.txt";
+char filenameA[] = "signal_t1.txt";
+char filenameB[] = "signal_t2.txt";
 
 void setup() {
   pinMode(LED_PIN, OUTPUT);
-  pinMode(SENSOR_PIN, INPUT);
+  pinMode(SENSOR_A_PIN, INPUT);
   Serial.begin(115200);
 
   data_counter = 0;
-  buffer_flag = true;
   cap_flag = LOW;
-  cycleCounter = 1;
 
   cTime = 0;
   write_flag = false;    //flag to write 
@@ -79,31 +76,25 @@ void setup() {
 
   IBI = 0;
 
-  //removeFile(filename);
+  removeFile(filenameB);
   
-  //interruptSetup();
+  interruptSetup();
   SDCardSetup();
-  readFileToVector(filename, data_b3, LENGTH_2);
-  process_signal();
+  //readFileToVector(filename, data_b3, LENGTH_2);
+  //process_signal();
   //three_point_derivative_method();
   //find_b_peaks();
-  compute_indexes();
+  //compute_indexes();
 }
 
 void loop() {
   
-//  Serial.print("Counter: ");
-//  Serial.print(data_counter);
-//  Serial.print("\tData: ");
-//  Serial.println(temp);
-  /*if (write_flag == true){
-    if (buffer_flag){
-      writeDataToFile(filename, data_b2, LENGTH);
-    }else{
-      writeDataToFile(filename, data_b1, LENGTH);
-    }
+  if (write_flag == true){
+    writeDataToFile(filenameA, data_b1, LENGTH);
+    writeDataToFile(filenameB, data_b2, LENGTH);
     write_flag = false;
-  }*/
+    readFileToSerial(filenameB);
+  }
 
   /*if (cap_flag && read_flag && !write_flag){
     readFileToSerial(filename);
