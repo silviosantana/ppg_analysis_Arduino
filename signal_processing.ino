@@ -1,4 +1,4 @@
-//signal at data_b3
+//signal at data_b2
 
 int slope_signal(float slope){
   if (slope == 0){
@@ -26,7 +26,7 @@ void split_line(char* r_line, int* amp, float* slope, int* peak, int* begin, int
 void process_signal(){
   int m = 2;
 
-  char r_line[20];
+  char r_line[25];
   byte n;
   
 
@@ -55,8 +55,8 @@ void process_signal(){
   int prev_peak;
   int prev_begin;
 
-  prev_slope = (float)(data_b3[m]-data_b3[0])/m;
-  prev_amp = (data_b3[m]-data_b3[0]);
+  prev_slope = (float)(data_b2[m]-data_b2[0])/m;
+  prev_amp = (data_b2[m]-data_b2[0]);
   prev_peak = m;
   prev_begin = 0;
   tCounter += m;
@@ -66,8 +66,8 @@ void process_signal(){
   //-----------------------------------------------IMS Algorithm BEGIN
   while ((tCounter + m) < LENGTH_2){
     
-    line_slope = (float)(data_b3[tCounter + m]-data_b3[tCounter])/m;
-    line_amp = (data_b3[tCounter + m]-data_b3[tCounter]);
+    line_slope = (float)(data_b2[tCounter + m]-data_b2[tCounter])/m;
+    line_amp = (data_b2[tCounter + m]-data_b2[tCounter]);
     line_peak = tCounter + m;
     line_begin = tCounter;
 
@@ -167,8 +167,8 @@ void process_signal(){
   myFile.close();
 
   IBI = IBI/IBIcounter;
-  Serial.println(IBIcounter);
-  Serial.println(IBI);
+  //Serial.println(IBIcounter);
+  //Serial.println(IBI);
 
   //-----------------------------------------------THRESHOLD Algorithm END
 
@@ -238,9 +238,9 @@ void process_signal(){
   //Serial.println(z_amp[0]);
   //Serial.println(z_slope[0]);
   //Serial.println(z_peak[0]);
-  //Serial.println(zCounter);
-  //Serial.println(thHigh);
-  //Serial.println(thLow);
+  Serial.println(zCounter);
+  Serial.println(thHigh);
+  Serial.println(thLow);
   //Serial.println(iCounter);
   //Serial.println(tCounter);
   //Serial.println(peakCounter);
@@ -262,7 +262,7 @@ void three_point_derivative_method(){
   }
 
   while (e <= LEN){
-    d1_point = (int) ((data_b3[e] - data_b3[b])/(2*T));
+    d1_point = (int) ((data_b2[e] - data_b2[b])/(2*T));
     //writeFloatToFile(d1_file, d1_point);
 
     myFile.println(d1_point);
@@ -276,7 +276,7 @@ void three_point_derivative_method(){
 
 int findNextLocalMin(int b, int e){
   int result;
-  while ((b + 1) <= e && data_b3[b + 1] < data_b3[b]){
+  while ((b + 1) <= e && data_b2[b + 1] < data_b2[b]){
     b++;
   }
 
@@ -290,7 +290,7 @@ int findNextLocalMin(int b, int e){
 
 int findNextLocalMax(int b, int e){
   int result = 0;
-  while ((b + 1) <= e && data_b3[b + 1] > data_b3[b]){
+  while ((b + 1) <= e && data_b2[b + 1] > data_b2[b]){
     b++;
   }
 
@@ -304,7 +304,7 @@ int findNextLocalMax(int b, int e){
 
 int findNextZeroCrossing (int b, int e){ // e se b nao existe?
   int result = 0;
-  while (b < e && data_b3[b] > 0){
+  while (b < e && data_b2[b] > 0){
     b++;
   }
 
@@ -318,7 +318,7 @@ int findNextZeroCrossing (int b, int e){ // e se b nao existe?
 
 int findPrevZeroCrossing (int b, int e){
   int result = 0;
-  while (b > 0 && data_b3[b] > 0){
+  while (b > 0 && data_b2[b] > 0){
     b--;
   }
 
@@ -350,14 +350,14 @@ void find_b_peaks(){
 
   removeFile(parametersFile);
 
-  readFileToVector(d1_file, data_b3, LENGTH_2 - 2);
+  readFileToVector(d1_file, data_b2, LENGTH_2 - 2);
 
   if (!auxFile.open(pulsesFile, O_READ)) {
     sd.errorHalt("opening test.txt for read failed");
   }
 
   byte n;
-  char r_line[20];
+  char r_line[25];
   while ((n = (int) auxFile.fgets(r_line, sizeof(r_line))) > 0){
     split_line(r_line, &line_amp, &line_slope, &line_peak, &line_begin, 0);
 
@@ -365,7 +365,7 @@ void find_b_peaks(){
     localMin = findNextLocalMin(line_peak, LENGTH_2 -2);
     localMax = findNextLocalMax(localMin, LENGTH_2 - 2);
 
-    if (data_b3[localMax] > 0){
+    if (data_b2[localMax] > 0){
       nextZero = findNextZeroCrossing(localMax, LENGTH_2 - 2);
       prevZero = findPrevZeroCrossing(localMax, LENGTH_2 - 2);
     }else{

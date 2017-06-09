@@ -10,11 +10,10 @@
 #define HIGHFAST 1.4
 #define TH 120
 
-int data_b3[LENGTH_2];
-char linesFile[] = "lines_t.txt";
-char pulsesFile[] = "pulses_t.txt";
-char d1_file[] = "d1_signal_t.txt";
-char parametersFile[] = "parameters_t.txt";
+char linesFile[] = "lines_5.txt";
+char pulsesFile[] = "pulses_5.txt";
+char d1_file[] = "d1_signal_5.txt";
+char parametersFile[] = "parameters_5.txt";
 //----------------------------- 
 
 #define FS 50.0   //Frequency (Hz)
@@ -38,7 +37,7 @@ const byte SENSOR_A_PIN = 8;
 
 volatile int signalA_in;
 volatile int data_b1[LENGTH];      //rough signal input buffer 1
-volatile int data_b2[LENGTH];      //rough signal input buffer 2
+int data_b2[LENGTH];      //rough signal input buffer 2
 volatile int data_counter = 0;
 volatile byte cap_flag = LOW;     //flag to capture
 volatile boolean buffer_flag = true;  //flag to choose the buffer
@@ -57,7 +56,7 @@ volatile byte ledFlag = LOW;
 volatile boolean write_flag;
 boolean read_flag;
 
-char filenameA[] = "signal_t1.txt";
+char filenameA[] = "signal_5.txt";
 char filenameB[] = "signal_t2.txt";
 
 void setup() {
@@ -76,25 +75,25 @@ void setup() {
 
   IBI = 0;
 
-  removeFile(filenameB);
+  removeFile(filenameA);
   
-  interruptSetup();
+  //interruptSetup();
   SDCardSetup();
-  //readFileToVector(filename, data_b3, LENGTH_2);
-  //process_signal();
-  //three_point_derivative_method();
-  //find_b_peaks();
-  //compute_indexes();
+  readFileToVector(filenameA, data_b2, LENGTH_2);
+  process_signal();
+  three_point_derivative_method();
+  find_b_peaks();
+  compute_indexes();
 }
 
 void loop() {
   
-  if (write_flag == true){
+  /*if (write_flag == true){
     writeDataToFile(filenameA, data_b1, LENGTH);
     writeDataToFile(filenameB, data_b2, LENGTH);
     write_flag = false;
     readFileToSerial(filenameB);
-  }
+  }*/
 
   /*if (cap_flag && read_flag && !write_flag){
     readFileToSerial(filename);

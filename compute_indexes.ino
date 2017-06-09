@@ -46,8 +46,8 @@ void compute_indexes(){
     
     if(CT > 0){
       if ((t_a_peak - prev_a_peak) <= (IBI + 10)){
-        DELTAT += (t_a_peak - prev_a_peak)/FS;
-        DELTATcounter++;
+        PPT += (t_a_peak - prev_a_peak)/FS;
+        PPTcounter++;
 
         RRT += (prev_a_peak - prev_t_begin)/(FS*(t_begin - prev_t_begin));
         RRTcounter++;
@@ -58,10 +58,10 @@ void compute_indexes(){
     }
 
     if (t_b_peak != -1){
-      PPT += (t_b_peak - t_a_peak)/FS;
-      PPTcounter++;
+      DELTAT += (t_b_peak - t_a_peak)/FS;
+      DELTATcounter++;
 
-      RI += (data_b3[t_a_peak] - data_b3[t_b_peak]);
+      RI += (data_b2[t_a_peak] - data_b2[t_b_peak]);
       RIcounter++;
     }
 
