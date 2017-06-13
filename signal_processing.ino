@@ -168,7 +168,7 @@ void process_signal(){
 
   IBI = IBI/IBIcounter;
   //Serial.println(IBIcounter);
-  //Serial.println(IBI);
+  Serial.println(IBI);
 
   //-----------------------------------------------THRESHOLD Algorithm END
 
@@ -330,6 +330,26 @@ int findPrevZeroCrossing (int b, int e){
   return result;
 }
 
+int findIntervalMax (int b, int e, int limit){
+  int max = data_b2[b];
+  int result = b;
+  int i = b + 1;
+
+  while (i <= e && i <= limit){
+    if (data_b2[i] >= max){
+      max = data_b2[i];
+      result = i;
+    }
+
+    i++;
+  }
+
+  if (result == e || result == limit){
+    result = -1;
+  }
+  return result;
+}
+
 
 void find_b_peaks(){
   /*
@@ -357,20 +377,23 @@ void find_b_peaks(){
   }
 
   byte n;
+  int interval_length = (int) (0.4*IBI); //40% of interbit interval
+  Serial.println(interval_length);
   char r_line[25];
   while ((n = (int) auxFile.fgets(r_line, sizeof(r_line))) > 0){
     split_line(r_line, &line_amp, &line_slope, &line_peak, &line_begin, 0);
 
     //Serial.println(line_peak+1);
     localMin = findNextLocalMin(line_peak, LENGTH_2 -2);
-    localMax = findNextLocalMax(localMin, LENGTH_2 - 2);
+    localMax = findIntervalMax(localMin, (localMin + interval_length),LENGTH_2 - 2);
 
     if (data_b2[localMax] > 0){
       nextZero = findNextZeroCrossing(localMax, LENGTH_2 - 2);
       prevZero = findPrevZeroCrossing(localMax, LENGTH_2 - 2);
     }else{
       nextZero = localMax;
-      prevZero = localMax - OFFSET;  //determinar offset correto
+      //prevZero = localMax - OFFSET;  //determinar offset correto
+      prevZero = localMax;
     }
 
     //t_begin | t_a_peak | dicrotic notch | t_b_peak

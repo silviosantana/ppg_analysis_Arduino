@@ -45,15 +45,15 @@ void compute_indexes(){
     split_parameters(r_line, &t_begin, &t_a_peak, &d_notch, &t_b_peak, 0);
     
     if(CT > 0){
-      if ((t_a_peak - prev_a_peak) <= (IBI + 10)){
+      if (((float)(t_a_peak - prev_a_peak)) <= (IBI*1.5)){
         PPT += (t_a_peak - prev_a_peak)/FS;
         PPTcounter++;
 
-        RRT += (prev_a_peak - prev_t_begin)/(FS*(t_begin - prev_t_begin));
-        RRTcounter++;
-
         DELTAP += (t_begin - prev_t_begin)/FS;
         DELTAPcounter++;
+
+        RRT += (prev_a_peak - prev_t_begin)/((t_begin - prev_t_begin)/FS);
+        RRTcounter++;
       }
     }
 
@@ -61,7 +61,7 @@ void compute_indexes(){
       DELTAT += (t_b_peak - t_a_peak)/FS;
       DELTATcounter++;
 
-      RI += (data_b2[t_a_peak] - data_b2[t_b_peak]);
+      RI += ((data_b2[t_a_peak] - data_b2[t_begin]) / (data_b2[t_b_peak] - data_b2[t_begin]))*100;
       RIcounter++;
     }
 
