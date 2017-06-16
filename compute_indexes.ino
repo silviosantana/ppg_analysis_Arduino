@@ -61,7 +61,7 @@ void compute_indexes(){
       DELTAT += (t_b_peak - t_a_peak)/FS;
       DELTATcounter++;
 
-      RI += ((data_b2[t_a_peak] - data_b2[t_begin]) / (data_b2[t_b_peak] - data_b2[t_begin]))*100;
+      RI += ((data_b2[t_b_peak] - data_b2[t_begin]) / (data_b2[t_a_peak] - data_b2[t_begin]))*100;
       RIcounter++;
     }
 

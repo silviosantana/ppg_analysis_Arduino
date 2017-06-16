@@ -116,24 +116,11 @@ void process_signal(){
   myFile.fgets(r_line, sizeof(r_line));
   split_line(r_line, z_amp, z_slope, z_peak, z_begin, 2);
 
-  int IBIcounter = -1;
-  int prev_tPeak;
-  IBI = 0;
-
   while ((n = (int) myFile.fgets(r_line, sizeof(r_line))) > 0){
     //Serial.println(r_line);
     split_line(r_line, &line_amp, &line_slope, &line_peak, &line_begin, 0);
 
     if (z_amp[1] >= TH){
-
-      if (IBIcounter == -1){
-        prev_tPeak = z_peak[1];
-        IBIcounter++;
-      }else{
-        IBI += (z_peak[1] - prev_tPeak);
-        prev_tPeak = z_peak[1];
-        IBIcounter ++;
-      }
 
       if (thLow == 0 && thHigh == 0){
         thLow = z_amp[1]*LOWSLOW;
@@ -165,11 +152,6 @@ void process_signal(){
 
   }
   myFile.close();
-
-  IBI = IBI/IBIcounter;
-  //Serial.println(IBIcounter);
-  Serial.println(IBI);
-
   //-----------------------------------------------THRESHOLD Algorithm END
 
 
@@ -191,9 +173,17 @@ void process_signal(){
   auxFile.fgets(r_line, sizeof(r_line));
   split_line(r_line, z_amp, z_slope, z_peak, z_begin, 2);
 
+  int IBIcounter = 0;
+  byte IBIflag = 0;
+  IBI = 0;
+  prev_peak = 0;
+
   if (z_amp[0] <= thHigh && z_amp[0] >= thLow && z_slope[1] != 0){
     writeLineToFile(pulsesFile, z_amp[0], z_slope[0], z_peak[0], z_begin[0]);
     peakCounter++;
+    
+    IBIflag = 1;
+    prev_peak = z_peak[0];
   }
 
 
@@ -204,7 +194,19 @@ void process_signal(){
     if (z_amp[1] <= thHigh && z_amp[1] >= thLow && z_slope[0] != 0 && z_slope[2] != 0){
       writeLineToFile(pulsesFile, z_amp[1], z_slope[1], z_peak[1], z_begin[1]);
       peakCounter++;
-    }
+
+      if (IBIflag == 1){
+        IBI += (z_peak[1] - prev_peak);
+        IBIcounter++;
+      }
+      prev_peak = z_peak[1];
+      IBIflag = 1;
+      
+    }else{
+      if(z_amp[1] >= TH){
+        IBIflag = 0;
+      }
+    }  
 
     z_amp[0] = z_amp[1];
     z_amp[1] = z_amp[2];
@@ -225,13 +227,35 @@ void process_signal(){
   if (z_amp[1] <= thHigh && z_amp[1] >= thLow && z_slope[0] != 0 && z_slope[2] != 0){
     writeLineToFile(pulsesFile, z_amp[1], z_slope[1], z_peak[1], z_begin[1]);
     peakCounter++;
+
+    if (IBIflag == 1){
+      IBI += (z_peak[1] - prev_peak);
+      IBIcounter++;
+    }
+    prev_peak = z_peak[1];
+    IBIflag = 1;
+
+  }else{
+    if(z_amp[1] >= TH){
+      IBIflag = 0;
+    }
   }
 
   if (z_amp[2] <= thHigh && z_amp[2] >= thLow && z_slope[1] != 0){
     writeLineToFile(pulsesFile, z_amp[2], z_slope[2], z_peak[2], z_begin[2]);
     peakCounter++;
+
+    if (IBIflag == 1){
+      IBI += (z_peak[2] - prev_peak);
+      IBIcounter++;
+    }
+    IBIflag = 1;
   }
 
+  IBI = IBI/IBIcounter;
+  //Serial.println(IBIcounter);
+  Serial.print("IBI: ");
+  Serial.println(IBI);
 
   //-----------------------------------------------ARTIFACT Algorithm END
 
@@ -393,7 +417,8 @@ void find_b_peaks(){
     }else{
       nextZero = localMax;
       //prevZero = localMax - OFFSET;  //determinar offset correto
-      prevZero = localMax;
+      //prevZero = localMax;
+      prevZero = line_peak + ((int) (0.25*IBI));
     }
 
     //t_begin | t_a_peak | dicrotic notch | t_b_peak

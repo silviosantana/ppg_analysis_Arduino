@@ -10,10 +10,11 @@
 #define HIGHFAST 1.4
 #define TH 120
 
-char linesFile[] = "lines_4.txt";
-char pulsesFile[] = "pulses_4.txt";
-char d1_file[] = "d1_signal_4.txt";
-char parametersFile[] = "parameters_4.txt";
+char filenameA[] = "signal_15.txt";
+char linesFile[] = "lines_15.txt";
+char pulsesFile[] = "pulses_15.txt";
+char d1_file[] = "d1_signal_15.txt";
+char parametersFile[] = "parameters_15.txt";
 //----------------------------- 
 
 #define FS 50.0   //Frequency (Hz)
@@ -56,7 +57,7 @@ volatile byte ledFlag = LOW;
 volatile boolean write_flag;
 boolean read_flag;
 
-char filenameA[] = "signal_4.txt";
+
 char filenameB[] = "signal_t2.txt";
 
 void setup() {
