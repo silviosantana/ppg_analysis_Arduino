@@ -93,3 +93,29 @@ void writeWaveParametersToFile(char* fname, int bg, int a, int dn, int b){
 
   myFile.close();
 }
+
+void writeIndexesToFile(char* fname, float PPT, float RI, float CT, float DELTAT, float RRT, float DELTAP, float AS, float AR){
+  if (!myFile.open(fname, O_RDWR | O_CREAT | O_AT_END)) {
+    sd.errorHalt("opening test.txt for write failed");
+  }
+
+  myFile.print("PPT: ");
+  myFile.println(PPT);
+  myFile.print("RI: ");
+  myFile.println(RI);
+  myFile.print("CT: ");
+  myFile.println(CT);
+  myFile.print("DELTAT: ");
+  myFile.println(DELTAT);
+  myFile.print("RRT: ");
+  myFile.println(RRT);
+  myFile.print("DELTAP: ");
+  myFile.println(DELTAP);
+  myFile.print("AS: ");
+  myFile.println(AS);
+  myFile.print("AR: ");
+  myFile.println(AR);
+
+
+  myFile.close();
+}

@@ -17,10 +17,10 @@ void compute_indexes(){
   int d_notch;
   int t_b_peak;
 
-  float prev_t_begin;
-  float prev_a_peak;
-  float prev_d_notch;
-  float prev_b_peak;
+  int prev_t_begin;
+  int prev_a_peak;
+  int prev_d_notch;
+  int prev_b_peak;
 
   PPT = 0;
   int PPTcounter = 0;
@@ -34,6 +34,10 @@ void compute_indexes(){
   int RRTcounter = 0;
   DELTAP = 0;
   int DELTAPcounter = 0;
+  AS = 0;
+  int AScounter = 0;
+  AR = 0;
+  int ARcounter = 0;
 
   if (!auxFile.open(parametersFile, O_READ)) {
     sd.errorHalt("opening test.txt for read failed");
@@ -52,6 +56,9 @@ void compute_indexes(){
         DELTAP += (t_begin - prev_t_begin)/FS;
         DELTAPcounter++;
 
+        AR += data_b2[prev_a_peak]/((t_begin - prev_t_begin)/FS);
+        ARcounter++;
+
         RRT += (prev_a_peak - prev_t_begin)/((t_begin - prev_t_begin)/FS);
         RRTcounter++;
       }
@@ -68,6 +75,10 @@ void compute_indexes(){
     CT += (t_a_peak - t_begin)/FS;
     CTcounter++;
 
+    AS += (data_b2[t_a_peak] - data_b2[t_begin])/((t_a_peak - t_begin)/FS);
+    AScounter++;
+
+
     prev_t_begin = t_begin;
     prev_a_peak = t_a_peak;
     prev_d_notch = d_notch;
@@ -76,11 +87,15 @@ void compute_indexes(){
   auxFile.close();
 
   PPT = PPT/PPTcounter;
-  RI = RI/RIcounter;
+  RI = abs(RI/RIcounter);
   CT = CT/CTcounter;
   DELTAT = DELTAT/DELTATcounter;
   RRT = RRT/RRTcounter;
   DELTAP = DELTAP/DELTAPcounter;
+  AS = abs(AS/AScounter);
+  AR = abs(AR/ARcounter);
+
+  writeIndexesToFile(dataFile, PPT, RI, CT, DELTAT, RRT, DELTAP, AS, AR);
 
   Serial.print(PPT);
   Serial.print("\t");
@@ -92,5 +107,9 @@ void compute_indexes(){
   Serial.print("\t");
   Serial.print(RRT);
   Serial.print("\t");
-  Serial.println(DELTAP);
+  Serial.print(DELTAP);
+  Serial.print("\t");
+  Serial.print(AS);
+  Serial.print("\t");
+  Serial.print(AR);
 }

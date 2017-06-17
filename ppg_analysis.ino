@@ -10,11 +10,12 @@
 #define HIGHFAST 1.4
 #define TH 120
 
-char filenameA[] = "signal_15.txt";
-char linesFile[] = "lines_15.txt";
-char pulsesFile[] = "pulses_15.txt";
-char d1_file[] = "d1_signal_15.txt";
-char parametersFile[] = "parameters_15.txt";
+char filenameA[] = "signal_6.txt";
+char linesFile[] = "lines_6.txt";
+char pulsesFile[] = "pulses_6.txt";
+char d1_file[] = "d1_signal_6.txt";
+char parametersFile[] = "parameters_6.txt";
+char dataFile[] = "data_6.txt";
 //----------------------------- 
 
 #define FS 50.0   //Frequency (Hz)
@@ -29,6 +30,8 @@ float DELTAT;
 float CT;
 float RRT;
 float DELTAP; 
+float AS;
+float AR;
 //----------------------------- end INDEXES
 
 //----------------------------- PIN's

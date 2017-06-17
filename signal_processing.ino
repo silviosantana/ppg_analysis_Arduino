@@ -268,6 +268,23 @@ void process_signal(){
   //Serial.println(iCounter);
   //Serial.println(tCounter);
   //Serial.println(peakCounter);
+
+  removeFile(dataFile);
+
+  if (!auxFile.open(dataFile, O_RDWR | O_CREAT | O_AT_END)) {
+    sd.errorHalt("opening test.txt for write failed");
+  }
+
+  auxFile.print("IBI: ");
+  auxFile.println(IBI);
+  auxFile.print("thHigh: ");
+  auxFile.println(thHigh);
+  auxFile.print("thLow: ");
+  auxFile.println(thLow);
+  auxFile.print("#lines: ");
+  auxFile.println(zCounter);
+
+  auxFile.close();
 }
 
 void three_point_derivative_method(){
