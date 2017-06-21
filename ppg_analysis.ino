@@ -10,12 +10,12 @@
 #define HIGHFAST 1.4
 #define TH 120
 
-char filenameA[] = "signal_6.txt";
-char linesFile[] = "lines_6.txt";
-char pulsesFile[] = "pulses_6.txt";
-char d1_file[] = "d1_signal_6.txt";
-char parametersFile[] = "parameters_6.txt";
-char dataFile[] = "data_6.txt";
+char filenameA[] = "signal_15b.txt";
+char linesFile[] = "lines_15b.txt";
+char pulsesFile[] = "pulses_15b.txt";
+char d1_file[] = "d1_signal_15b.txt";
+char parametersFile[] = "parameters_15b.csv";
+char dataFile[] = "data_15b.txt";
 //----------------------------- 
 
 #define FS 50.0   //Frequency (Hz)
@@ -87,6 +87,7 @@ void setup() {
   process_signal();
   three_point_derivative_method();
   find_b_peaks();
+  readFileToVector(filenameA, data_b2, LENGTH_2);
   compute_indexes();
 }
 

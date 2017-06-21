@@ -1,12 +1,12 @@
 void split_parameters(char* r_line, int* t_begin, int* a_peak, int* d_notch, int* b_peak, int pos){
   char* pch;
-  pch = strtok (r_line,";");
+  pch = strtok (r_line,",");
   t_begin [pos] = atoi(pch);
-  pch = strtok (NULL, ";");
+  pch = strtok (NULL, ",");
   a_peak [pos] = atof(pch);
-  pch = strtok (NULL, ";");
+  pch = strtok (NULL, ",");
   d_notch [pos] = atoi(pch);
-  pch = strtok (NULL, ";");
+  pch = strtok (NULL, ",");
   b_peak [pos] = atoi(pch);
 }
 
@@ -56,10 +56,10 @@ void compute_indexes(){
         DELTAP += (t_begin - prev_t_begin)/FS;
         DELTAPcounter++;
 
-        AR += data_b2[prev_a_peak]/((t_begin - prev_t_begin)/FS);
+        AR += ((float)(data_b2[prev_a_peak] - data_b2[prev_t_begin]))/((float)(t_begin - prev_t_begin)/FS);
         ARcounter++;
 
-        RRT += (prev_a_peak - prev_t_begin)/((t_begin - prev_t_begin)/FS);
+        RRT += ((float)(prev_a_peak - prev_t_begin))/((float)(t_begin - prev_t_begin));
         RRTcounter++;
       }
     }
@@ -68,7 +68,7 @@ void compute_indexes(){
       DELTAT += (t_b_peak - t_a_peak)/FS;
       DELTATcounter++;
 
-      RI += ((data_b2[t_b_peak] - data_b2[t_begin]) / (data_b2[t_a_peak] - data_b2[t_begin]))*100;
+      RI += ((float)(data_b2[t_b_peak] - data_b2[t_begin]) / (float)(data_b2[t_a_peak] - data_b2[t_begin]))*100;
       RIcounter++;
     }
 

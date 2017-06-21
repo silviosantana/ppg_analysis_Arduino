@@ -84,11 +84,11 @@ void writeWaveParametersToFile(char* fname, int bg, int a, int dn, int b){
   }
 
   myFile.print(bg);
-  myFile.print(";");
+  myFile.print(",");
   myFile.print(a);
-  myFile.print(";");
+  myFile.print(",");
   myFile.print(dn);
-  myFile.print(";");
+  myFile.print(",");
   myFile.println(b);
 
   myFile.close();

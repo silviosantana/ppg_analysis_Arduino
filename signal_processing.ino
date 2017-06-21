@@ -428,15 +428,21 @@ void find_b_peaks(){
     localMin = findNextLocalMin(line_peak, LENGTH_2 -2);
     localMax = findIntervalMax(localMin, (localMin + interval_length),LENGTH_2 - 2);
 
-    if (data_b2[localMax] > 0){
-      nextZero = findNextZeroCrossing(localMax, LENGTH_2 - 2);
-      prevZero = findPrevZeroCrossing(localMax, LENGTH_2 - 2);
-    }else{
+    if (localMax == -1){
+      prevZero = localMax;
       nextZero = localMax;
-      //prevZero = localMax - OFFSET;  //determinar offset correto
-      //prevZero = localMax;
-      prevZero = line_peak + ((int) (0.25*IBI));
+    }else{
+      if (data_b2[localMax] > 0){
+        nextZero = findNextZeroCrossing(localMax, LENGTH_2 - 2);
+        prevZero = findPrevZeroCrossing(localMax, LENGTH_2 - 2);
+      }else{
+        nextZero = localMax;
+        //prevZero = localMax - OFFSET;  //determinar offset correto
+        //prevZero = localMax;
+        prevZero = line_peak + ((int) (0.25*IBI));
+      }
     }
+    
 
     //t_begin | t_a_peak | dicrotic notch | t_b_peak
     writeWaveParametersToFile(parametersFile, line_begin, line_peak, prevZero, nextZero);
