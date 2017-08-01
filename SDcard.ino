@@ -11,7 +11,8 @@ void removeFile(char* fname){
 void writeDataToFile(char* fname, volatile int* data, int len){
   // open the file for write at end like the Native SD library
   if (!myFile.open(fname, O_RDWR | O_CREAT | O_AT_END)) {
-    sd.errorHalt("opening test.txt for write failed");
+    sd.errorHalt("file error: ");
+    Serial.println("1");
   }
 
   // if the file opened okay, write to it:
@@ -28,9 +29,10 @@ void writeDataToFile(char* fname, volatile int* data, int len){
 void readFileToSerial(char* fname){
   // re-open the file for reading:
   if (!myFile.open(fname, O_READ)) {
-    sd.errorHalt("opening test.txt for read failed");
+    sd.errorHalt("file error: ");
+    Serial.println("2");
   }
-  Serial.println(fname);
+  //Serial.println(fname);
 
   // read from the file until there's nothing else in it:
   int readData;
@@ -44,9 +46,10 @@ void readFileToSerial(char* fname){
 void readFileToVector(char* fname, int* data, int len){
   // re-open the file for reading:
   if (!myFile.open(fname, O_READ)) {
-    sd.errorHalt("opening test.txt for read failed");
+    sd.errorHalt("file error: ");
+    Serial.println("3");
   }
-  Serial.println(fname);
+  //Serial.println(fname);
   // read from the file until there's nothing else in it:
   int readData;
   int count = 0;
@@ -63,7 +66,8 @@ void readFileToVector(char* fname, int* data, int len){
 
 void writeLineToFile(char* fname, int amp, float slope, int tPeak, int tBegin){
   if (!myFile.open(fname, O_RDWR | O_CREAT | O_AT_END)) {
-    sd.errorHalt("opening test.txt for write failed");
+    sd.errorHalt("file error: ");
+    Serial.println("4");
   }
 
   myFile.print(amp);
@@ -80,7 +84,8 @@ void writeLineToFile(char* fname, int amp, float slope, int tPeak, int tBegin){
 
 void writeWaveParametersToFile(char* fname, int bg, int a, int dn, int b){
   if (!myFile.open(fname, O_RDWR | O_CREAT | O_AT_END)) {
-    sd.errorHalt("opening test.txt for write failed");
+    sd.errorHalt("file error: ");
+    Serial.println("5");
   }
 
   myFile.print(bg);
@@ -96,7 +101,8 @@ void writeWaveParametersToFile(char* fname, int bg, int a, int dn, int b){
 
 void writeIndexesToFile(char* fname, float PPT, float RI, float CT, float DELTAT, float RRT, float DELTAP, float AS, float AR){
   if (!myFile.open(fname, O_RDWR | O_CREAT | O_AT_END)) {
-    sd.errorHalt("opening test.txt for write failed");
+    sd.errorHalt("file error: ");
+    Serial.println("6");
   }
 
   myFile.print("PPT: ");

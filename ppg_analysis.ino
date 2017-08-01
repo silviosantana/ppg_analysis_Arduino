@@ -10,18 +10,18 @@
 #define HIGHFAST 1.4
 #define TH 120
 
-char filenameA[] = "signal_15b.txt";
-char linesFile[] = "lines_15b.txt";
-char pulsesFile[] = "pulses_15b.txt";
-char d1_file[] = "d1_signal_15b.txt";
-char parametersFile[] = "parameters_15b.csv";
-char dataFile[] = "data_15b.txt";
+char filenameA[] = "signal_4.txt";
+char linesFile[] = "lines_4.txt";
+char pulsesFile[] = "pulses_4.txt";
+char d1_file[] = "d1_signal_4.txt";
+char parametersFile[] = "parameters_4.csv";
+char dataFile[] = "data_4.txt";
 //----------------------------- 
 
 #define FS 50.0   //Frequency (Hz)
 #define LENGTH 1000 //Fs*recording_time (hz*sec)
 #define CAP_CYCLES 1 //(Fs*recording_time)/lenght
-const float VOLTAGE_STEP = 0.0048828125; //AD 10bits converter (0-5 volts)
+//const float VOLTAGE_STEP = 0.0048828125; //AD 10bits converter (0-5 volts)
 
 //----------------------------- INDEXES
 float PPT;
@@ -45,7 +45,7 @@ int data_b2[LENGTH];      //rough signal input buffer 2
 volatile int data_counter = 0;
 volatile byte cap_flag = LOW;     //flag to capture
 volatile boolean buffer_flag = true;  //flag to choose the buffer
-volatile float temp;
+//volatile float temp;
 volatile int cTime;// store current time
 float IBI;
 
@@ -60,8 +60,6 @@ volatile byte ledFlag = LOW;
 volatile boolean write_flag;
 boolean read_flag;
 
-
-char filenameB[] = "signal_t2.txt";
 
 void setup() {
   pinMode(LED_PIN, OUTPUT);
@@ -82,13 +80,19 @@ void setup() {
   removeFile(filenameA);
   
   //interruptSetup();
+  
   SDCardSetup();
+  Serial.println(millis());
   readFileToVector(filenameA, data_b2, LENGTH_2);
+  Serial.println(millis());
   process_signal();
   three_point_derivative_method();
   find_b_peaks();
+  Serial.println(millis());
   readFileToVector(filenameA, data_b2, LENGTH_2);
+  Serial.println(millis());
   compute_indexes();
+  
 }
 
 void loop() {

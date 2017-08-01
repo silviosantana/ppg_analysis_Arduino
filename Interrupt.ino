@@ -25,7 +25,7 @@ ISR(TIMER1_COMPA_vect){                        // triggered when Timer1 counts t
       data_b1[data_counter] = signalA_in;
       data_b2[data_counter] = signalA_in;
       //v_data[data_counter] = (float) signal_in * VOLTAGE_STEP;
-      temp = data_b1[data_counter];
+      //temp = data_b1[data_counter];
       
       data_counter++;
     }else{

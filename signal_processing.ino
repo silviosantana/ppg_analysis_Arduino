@@ -102,7 +102,8 @@ void process_signal(){
   
   //-----------------------------------------------THRESHOLD Algorithm BEGIN
   if (!myFile.open(linesFile, O_READ)) {
-    sd.errorHalt("opening test.txt for read failed");
+    sd.errorHalt("file error: ");
+    Serial.println("7");
   }
 
   myFile.fgets(r_line, sizeof(r_line));
@@ -163,7 +164,8 @@ void process_signal(){
   */
   peakCounter = 0;
   if (!auxFile.open(linesFile, O_READ)) {
-    sd.errorHalt("opening test.txt for read failed");
+    sd.errorHalt("file error: ");
+    Serial.println("8");
   }
 
   auxFile.fgets(r_line, sizeof(r_line));
@@ -254,17 +256,17 @@ void process_signal(){
 
   IBI = IBI/IBIcounter;
   //Serial.println(IBIcounter);
-  Serial.print("IBI: ");
-  Serial.println(IBI);
+  //Serial.print("IBI: ");
+  //Serial.println(IBI);
 
   //-----------------------------------------------ARTIFACT Algorithm END
 
   //Serial.println(z_amp[0]);
   //Serial.println(z_slope[0]);
   //Serial.println(z_peak[0]);
-  Serial.println(zCounter);
-  Serial.println(thHigh);
-  Serial.println(thLow);
+  //Serial.println(zCounter);
+  //Serial.println(thHigh);
+  //Serial.println(thLow);
   //Serial.println(iCounter);
   //Serial.println(tCounter);
   //Serial.println(peakCounter);
@@ -272,7 +274,8 @@ void process_signal(){
   removeFile(dataFile);
 
   if (!auxFile.open(dataFile, O_RDWR | O_CREAT | O_AT_END)) {
-    sd.errorHalt("opening test.txt for write failed");
+    sd.errorHalt("file error: ");
+    Serial.println("9");
   }
 
   auxFile.print("IBI: ");
@@ -299,7 +302,7 @@ void three_point_derivative_method(){
   removeFile(d1_file);
 
   if (!myFile.open(d1_file, O_RDWR | O_CREAT | O_AT_END)) {
-    sd.errorHalt("opening test.txt for write failed");
+    sd.errorHalt("file error: derivate");
   }
 
   while (e <= LEN){
@@ -414,12 +417,13 @@ void find_b_peaks(){
   readFileToVector(d1_file, data_b2, LENGTH_2 - 2);
 
   if (!auxFile.open(pulsesFile, O_READ)) {
-    sd.errorHalt("opening test.txt for read failed");
+    sd.errorHalt("file error: ");
+    Serial.println("10");
   }
 
   byte n;
   int interval_length = (int) (0.4*IBI); //40% of interbit interval
-  Serial.println(interval_length);
+  //Serial.println(interval_length);
   char r_line[25];
   while ((n = (int) auxFile.fgets(r_line, sizeof(r_line))) > 0){
     split_line(r_line, &line_amp, &line_slope, &line_peak, &line_begin, 0);
