@@ -22,6 +22,26 @@ void split_line(char* r_line, int* amp, float* slope, int* peak, int* begin, int
   begin [pos] = atoi(pch);
 }
 
+void moving_average(char* filtered_filename){
+  int i, j, soma;
+  int MED_SIZE = 5;
+
+  removeFile(filtered_filename);
+
+  for (i = 0; i < LENGTH_2 - MED_SIZE; i ++){
+    soma = 0;
+    for (j = i; j < i + MED_SIZE; j++){
+      soma += data_b1[j];
+    }
+    data_b2[i] = soma/MED_SIZE;
+  }
+  for (; i < LENGTH_2; i++){
+    data_b2[i] = 0;
+  }
+
+  writeDataToFile(filtered_filename, data_b2, LENGTH_2);
+}
+
 
 void process_signal(){
   int m = 2;

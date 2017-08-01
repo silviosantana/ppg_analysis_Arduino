@@ -98,19 +98,19 @@ void compute_indexes(){
 
   writeIndexesToFile(dataFile, PPT, RI, CT, DELTAT, RRT, DELTAP, AS, AR);
 
-  //Serial.print(PPT);
-  //Serial.print("\t");
-  //Serial.print(RI);
-  //Serial.print("\t");
-  //Serial.print(CT);
-  //Serial.print("\t");
-  //Serial.print(DELTAT);
-  //Serial.print("\t");
-  //Serial.print(RRT);
-  //Serial.print("\t");
-  //Serial.print(DELTAP);
-  //Serial.print("\t");
-  //Serial.print(AS);
-  //Serial.print("\t");
-  //Serial.print(AR);
+  Serial.print(PPT);
+  Serial.print("\t");
+  Serial.print(RI);
+  Serial.print("\t");
+  Serial.print(CT);
+  Serial.print("\t");
+  Serial.print(DELTAT);
+  Serial.print("\t");
+  Serial.print(RRT);
+  Serial.print("\t");
+  Serial.print(DELTAP);
+  Serial.print("\t");
+  Serial.print(AS);
+  Serial.print("\t");
+  Serial.println(AR);
 }
