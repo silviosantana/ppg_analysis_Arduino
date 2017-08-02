@@ -44,7 +44,7 @@ void moving_average(char* filtered_filename){
 
 
 void process_signal(){
-  int m = 2;
+  int m = 3;
 
   char r_line[25];
   byte n;
@@ -200,7 +200,7 @@ void process_signal(){
   IBI = 0;
   prev_peak = 0;
 
-  if (z_amp[0] <= thHigh && z_amp[0] >= thLow && z_slope[1] != 0){
+  if (z_amp[0] <= thHigh && z_amp[0] >= thLow && !(z_slope[1] == 0 && (z_peak[1] - z_begin[1]) > CLIP_TIME*FS)){
     writeLineToFile(pulsesFile, z_amp[0], z_slope[0], z_peak[0], z_begin[0]);
     peakCounter++;
     
@@ -213,7 +213,7 @@ void process_signal(){
     //Serial.println(r_line);
     split_line(r_line, &line_amp, &line_slope, &line_peak, &line_begin, 0);
 
-    if (z_amp[1] <= thHigh && z_amp[1] >= thLow && z_slope[0] != 0 && z_slope[2] != 0){
+    if (z_amp[1] <= thHigh && z_amp[1] >= thLow && !(z_slope[0] == 0 && (z_peak[0] - z_begin[0]) > CLIP_TIME*FS) && !(z_slope[2] == 0 && (z_peak[2] - z_begin[2]) > CLIP_TIME*FS)){
       writeLineToFile(pulsesFile, z_amp[1], z_slope[1], z_peak[1], z_begin[1]);
       peakCounter++;
 
@@ -246,7 +246,7 @@ void process_signal(){
   }
   auxFile.close();
 
-  if (z_amp[1] <= thHigh && z_amp[1] >= thLow && z_slope[0] != 0 && z_slope[2] != 0){
+  if (z_amp[1] <= thHigh && z_amp[1] >= thLow && !(z_slope[0] == 0 && (z_peak[0] - z_begin[0]) > CLIP_TIME*FS) && !(z_slope[2] == 0 && (z_peak[2] - z_begin[2]) > CLIP_TIME*FS)){
     writeLineToFile(pulsesFile, z_amp[1], z_slope[1], z_peak[1], z_begin[1]);
     peakCounter++;
 
@@ -263,7 +263,7 @@ void process_signal(){
     }
   }
 
-  if (z_amp[2] <= thHigh && z_amp[2] >= thLow && z_slope[1] != 0){
+  if (z_amp[2] <= thHigh && z_amp[2] >= thLow && !(z_slope[1] == 0 && (z_peak[1] - z_begin[1]) > CLIP_TIME*FS)){
     writeLineToFile(pulsesFile, z_amp[2], z_slope[2], z_peak[2], z_begin[2]);
     peakCounter++;
 

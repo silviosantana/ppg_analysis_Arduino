@@ -21,12 +21,13 @@ char dataFile[] = "data_16.txt";
 char filteredSignal[] = "filtered_16.txt";
 
 
-char filenameB[] = "signal_16b.txt";
+char filenameB[] = "signal_17.txt";
 //----------------------------- 
 
 #define FS 50.0   //Frequency (Hz)
 #define LENGTH 1000 //Fs*recording_time (hz*sec)
 #define CAP_CYCLES 1 //(Fs*recording_time)/lenght
+#define CLIP_TIME 0.25
 //const float VOLTAGE_STEP = 0.0048828125; //AD 10bits converter (0-5 volts)
 
 //----------------------------- INDEXES
@@ -104,6 +105,7 @@ void loop() {
     writeDataToFile(filenameA, data_b1, LENGTH);
     writeDataToFile(filenameB, data_b2, LENGTH);
     write_flag = false;
+    
     Serial.println("File A");
     readFileToSerial(filenameA);
     Serial.println("File B");
@@ -120,13 +122,13 @@ void loop() {
     readFileToVector(filteredSignal, data_b2, LENGTH_2);
     compute_indexes();
 
-    strcpy(filenameA, "signal_16b.txt");
-    strcpy(linesFile, "lines_16b.txt");
-    strcpy(pulsesFile, "pulses_16b.txt");
-    strcpy(d1_file, "d1_signal_16b.txt");
-    strcpy(parametersFile, "parameters_16b.csv");
-    strcpy(dataFile, "data_16b.txt");
-    strcpy(filteredSignal, "filtered_16b.txt");
+    strcpy(filenameA, "signal_17.txt");
+    strcpy(linesFile, "lines_17.txt");
+    strcpy(pulsesFile, "pulses_17.txt");
+    strcpy(d1_file, "d1_signal_17.txt");
+    strcpy(parametersFile, "parameters_17.csv");
+    strcpy(dataFile, "data_17.txt");
+    strcpy(filteredSignal, "filtered_17.txt");
 
     readFileToVector(filenameA, data_b1, LENGTH_2);
     moving_average(filteredSignal);
