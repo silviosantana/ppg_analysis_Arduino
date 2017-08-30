@@ -11,19 +11,30 @@ void interruptSetup(){
   sei();         // MAKE SURE GLOBAL INTERRUPTS ARE ENABLED     
 } 
 
+void sendDataToSerial(char symbol, int data ){
+  Serial.print(symbol);
+  Serial.println(data);     
+}
+
 // THIS IS THE TIMER 1 INTERRUPT SERVICE ROUTINE.
 // Timer 1 makes sure that we take a reading every x miliseconds
 //ISR(TIMER2_COMPA_vect){                         // triggered when Timer2 counts to 124
 ISR(TIMER1_COMPA_vect){                        // triggered when Timer1 counts to ORC1A
   cli();                                      // disable interrupts while we do this
   signalA_in = analogRead(SENSOR_A_PIN);
-  //Serial.println(signal_in);
+  signalB_in = analogRead(SENSOR_B_PIN);
+
+  Serial.println("begin");
+  sendDataToSerial('T', signalA_in);
+  sendDataToSerial('S', signalB_in);
+  Serial.println("end");
+  Serial.println("1");
 
   if (cTime > 500){//count 10s before start reading
     if (data_counter < LENGTH){
       ledFlag = HIGH;
       data_b1[data_counter] = signalA_in;
-      data_b2[data_counter] = signalA_in;
+      data_b2[data_counter] = signalB_in;
       //v_data[data_counter] = (float) signal_in * VOLTAGE_STEP;
       //temp = data_b1[data_counter];
       
@@ -37,7 +48,7 @@ ISR(TIMER1_COMPA_vect){                        // triggered when Timer1 counts t
       ledFlag = LOW;
     }
   }else{
-    cTime = cTime + 1;
+    //cTime = cTime + 1;
       
   }
   

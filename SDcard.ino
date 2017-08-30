@@ -2,6 +2,7 @@ void SDCardSetup(){
   if (!sd.begin(chipSelect, SPI_FULL_SPEED)) {
     sd.initErrorHalt();
   }
+  //Serial.println("SD Settup done!");
 } 
 
 void removeFile(char* fname){

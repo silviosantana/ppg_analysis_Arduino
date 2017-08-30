@@ -12,16 +12,16 @@
 #define TH 30
 
 
-char filenameA[] = "signal_16.txt";
-char linesFile[] = "lines_16.txt";
-char pulsesFile[] = "pulses_16.txt";
-char d1_file[] = "d1_signal_16.txt";
-char parametersFile[] = "parameters_16.csv";
-char dataFile[] = "data_16.txt";
-char filteredSignal[] = "filtered_16.txt";
+char filenameA[] = "signal_19.txt";
+char linesFile[] = "lines_19.txt";
+char pulsesFile[] = "pulses_19.txt";
+char d1_file[] = "d1_signal_19.txt";
+char parametersFile[] = "parameters_19.csv";
+char dataFile[] = "data_19.txt";
+char filteredSignal[] = "filtered_19.txt";
 
 
-char filenameB[] = "signal_17.txt";
+char filenameB[] = "signal_20.txt";
 //----------------------------- 
 
 #define FS 50.0   //Frequency (Hz)
@@ -42,11 +42,18 @@ float AR;
 //----------------------------- end INDEXES
 
 //----------------------------- PIN's
-const byte LED_PIN = 13;
-const byte SENSOR_A_PIN = 8;
+//const byte LED_PIN = 13;
+const byte SENSOR_A_PIN = 0;
+const byte SENSOR_B_PIN = 1;
+//int SENSOR_A_ENABLE_IR = 1;
+int SENSOR_A_ENABLE_V = 7;
+int SENSOR_B_ENABLE_IR = 3;
+int SENSOR_B_ENABLE_V = 2;
+const byte START_PIN = 5;
 //-----------------------------
 
 volatile int signalA_in;
+volatile int signalB_in;
 int data_b1[LENGTH];      //rough signal input buffer 1
 int data_b2[LENGTH];      //rough signal input buffer 2
 volatile int data_counter = 0;
@@ -69,9 +76,19 @@ boolean process_flag;
 boolean read_flag;
 
 
+
 void setup() {
-  pinMode(LED_PIN, OUTPUT);
+  //pinMode(LED_PIN, OUTPUT);
   pinMode(SENSOR_A_PIN, INPUT);
+  pinMode(SENSOR_B_PIN, INPUT);
+
+  //pinMode(SENSOR_A_ENABLE_IR, OUTPUT);
+  pinMode(SENSOR_A_ENABLE_V, OUTPUT);
+  pinMode(SENSOR_B_ENABLE_IR, OUTPUT);
+  pinMode(SENSOR_B_ENABLE_V, OUTPUT);
+
+  pinMode(START_PIN, INPUT);
+
   Serial.begin(115200);
 
   data_counter = 0;
@@ -86,32 +103,39 @@ void setup() {
 
   IBI = 0;
 
-  //removeFile(filenameA);
-  //removeFile(filenameB);
-  
-  //interruptSetup();
-  
   SDCardSetup();
 
-  process_flag = true;
+  removeFile(filenameA);
+  removeFile(filenameB);
   
+  interruptSetup();
 
-  
+  //process_flag = true;
 }
 
 void loop() {
+
+  //digitalWrite(SENSOR_A_ENABLE_IR, HIGH);
+  digitalWrite(SENSOR_B_ENABLE_IR, HIGH);
+  digitalWrite(SENSOR_A_ENABLE_V, LOW);
+  digitalWrite(SENSOR_B_ENABLE_V, LOW);
+
+  if(digitalRead(START_PIN)){
+    cTime = 600;
+    Serial.println("START_PIN");
+  }
   
-  /*if (write_flag == true){
+  if (write_flag == true){
     writeDataToFile(filenameA, data_b1, LENGTH);
     writeDataToFile(filenameB, data_b2, LENGTH);
     write_flag = false;
     
-    Serial.println("File A");
+    /*Serial.println("File A");
     readFileToSerial(filenameA);
     Serial.println("File B");
-    readFileToSerial(filenameB);
+    readFileToSerial(filenameB);*/
     process_flag = true;
-  }*/
+  }
 
   if(process_flag == true){
     readFileToVector(filenameA, data_b1, LENGTH_2);
@@ -122,13 +146,13 @@ void loop() {
     readFileToVector(filteredSignal, data_b2, LENGTH_2);
     compute_indexes();
 
-    strcpy(filenameA, "signal_17.txt");
-    strcpy(linesFile, "lines_17.txt");
-    strcpy(pulsesFile, "pulses_17.txt");
-    strcpy(d1_file, "d1_signal_17.txt");
-    strcpy(parametersFile, "parameters_17.csv");
-    strcpy(dataFile, "data_17.txt");
-    strcpy(filteredSignal, "filtered_17.txt");
+    strcpy(filenameA, "signal_20.txt");
+    strcpy(linesFile, "lines_20.txt");
+    strcpy(pulsesFile, "pulses_20.txt");
+    strcpy(d1_file, "d1_signal_20.txt");
+    strcpy(parametersFile, "parameters_20.csv");
+    strcpy(dataFile, "data_20.txt");
+    strcpy(filteredSignal, "filtered_20.txt");
 
     readFileToVector(filenameA, data_b1, LENGTH_2);
     moving_average(filteredSignal);
@@ -146,6 +170,6 @@ void loop() {
     read_flag = false;
   }*/
   
-  digitalWrite(LED_PIN, ledFlag);
+  //digitalWrite(LED_PIN, ledFlag);
   delay(10);
 }
